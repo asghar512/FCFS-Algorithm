@@ -1,0 +1,78 @@
+#include<stdio.h>
+int main(){
+	int n,i,j,k,p[15],burst_time[15],arrival_Time[15], waiting_time[15], turnaround_time[15];
+	int time_slice, completion_time[15], max;	
+	float avgwt, avgtat,temp=0;
+	
+	printf("Enter The Number Of Processes : ");
+	scanf("%d", &n);
+	
+	// taking input from user in burst time
+	for(i=0; i<n; i++){
+		p[i]=i;
+		printf("\nEnter Burst Time And Arrival Time For Process : %d ", i);
+		scanf("%d %d", &burst_time[i], &arrival_Time[i]);
+		
+		completion_time[i]=burst_time[i];
+		
+	} 
+	
+	for(i=0;i<n;i++)
+		for(k=i+1;k<n;k++)
+		if(arrival_Time[i]>arrival_Time[k]) {
+			temp=arrival_Time[i];
+			arrival_Time[i]=arrival_Time[k];
+			arrival_Time[k]=temp;
+			
+			temp=p[i];
+			p[i]=p[k];
+			p[k]=temp;
+
+			temp=completion_time[i];
+			completion_time[i]=completion_time[k];
+			completion_time[k]=temp;
+		}
+	
+	printf("\nEnter The Amount Of Time Slice/Quantum : ");
+	scanf("%d", &time_slice);
+	
+	max=burst_time[0];
+	
+	// Calculating TurnAround Time For Each Process
+	for(i=1; i<n; i++){
+		if(max<burst_time[i]){
+			max=burst_time[i];
+		}
+		
+		for(j=0; j<(max/time_slice)+1; j++){
+			for(i=0; i<n; i++){
+				
+				if(burst_time[i]!=0){
+					if(burst_time[i]<=time_slice){
+						turnaround_time[i]=temp+burst_time[i];
+						temp=temp+burst_time[i];
+						burst_time[i]=0;
+					}
+					else{
+						burst_time[i]=burst_time[i]-time_slice;
+						temp=temp+time_slice;
+					}
+				}
+			}
+		}
+	}
+	
+	for(i=0; i<n; i++){
+		waiting_time[i]=turnaround_time[i]-completion_time[i];
+		avgtat=avgtat+turnaround_time[i];
+		avgwt=avgwt+waiting_time[i];
+	}
+	
+	printf("\n\t Process\t Burst Time\t Arrival Time\t Waiting Time \t Turnaround Time \n");
+	for(i=0; i<n; i++){
+		printf("\t%d \t\t%d \t\t%d \t\t%d \t\t%d\n", p[i], completion_time[i],arrival_Time[i], waiting_time[i], turnaround_time[i]);
+	}
+	
+	printf("\nAverage Waiting Time Is : %f ", avgwt/n);
+	printf("\nAverage TurnAround Time : %f ", avgtat/n);
+}
